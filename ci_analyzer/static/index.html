@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#15775a">
+  <title>CI Failure Analyzer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+  <script defer src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+  <script defer src="/static/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <aside class="sidebar">
+    <a class="brand" href="/" aria-label="CI Analyzer home"><span class="brand-symbol"><i data-lucide="workflow"></i></span><span>CI Analyzer<span class="brand-caption">BUILD INTELLIGENCE</span></span></a>
+    <div class="workspace"><span class="workspace-avatar">B</span><div>Build workspace<small>Local environment</small></div><i data-lucide="chevrons-up-down"></i></div>
+    <p class="nav-label">WORKSPACE</p>
+    <nav aria-label="Main navigation">
+      <a href="#overview" class="nav-link active"><i data-lucide="layout-dashboard"></i><span>Overview</span></a>
+      <a href="#builds" class="nav-link"><i data-lucide="layers"></i><span>Build history</span><span id="nav-count" class="nav-count">0</span></a>
+      <a href="#tests" class="nav-link"><i data-lucide="flask-conical"></i><span>Failing tests</span></a>
+    </nav>
+    <div class="sidebar-bottom">
+      <a href="/docs" target="_blank" rel="noopener" class="nav-link"><i data-lucide="braces"></i><span>API reference</span><i data-lucide="arrow-up-right"></i></a>
+      <div class="connection"><span id="connection-dot" class="dot"></span><span id="connection-text">Connecting</span><span class="version">v0.1</span></div>
+      <div class="profile"><span class="profile-avatar">B</span><div>Bhawana's workspace<small>CI Failure Analyzer</small></div></div>
+    </div>
+  </aside>
+  <div class="app-shell">
+    <header class="topbar"><div><span class="muted">Workspace</span><span class="breadcrumb-divider">/</span><strong>Overview</strong></div><div class="topbar-right"><span class="local-label"><span class="dot green"></span>Local instance</span><a href="/docs" target="_blank" rel="noopener" class="icon-button" title="Open API reference" aria-label="Open API reference"><i data-lucide="book-open"></i></a></div></header>
+    <main id="main">
+      <div id="connection-error" class="error-banner" role="alert" hidden><span>Cannot reach the server.</span><button type="button" id="retry" class="text-button">Retry</button></div>
+      <section id="overview" class="page-heading">
+        <div><div class="eyebrow"><span class="dot green"></span>PIPELINE HEALTH</div><h1>CI Failure Analyzer</h1><p class="subtitle">Build reliability, at a glance.</p></div>
+        <div class="heading-actions"><button class="button secondary" id="refresh" type="button"><i data-lucide="refresh-cw"></i>Refresh</button><button class="button primary" id="open-upload" type="button"><i data-lucide="plus"></i>Analyze log</button></div>
+      </section>
+      <div class="scope-line"><span><i data-lucide="database"></i>All projects <span class="scope-divider">/</span> All stored builds</span><span id="updated-at">Not synced yet</span></div>
+      <section class="metrics" aria-label="Build metrics">
+        <article class="metric"><div class="metric-label">Total builds<i data-lucide="layers"></i></div><div id="metric-total" class="metric-value">0</div><div class="metric-foot">Analyzed builds</div></article>
+        <article class="metric"><div class="metric-label">Passed builds<i data-lucide="circle-check" class="green-text"></i></div><div id="metric-passed" class="metric-value">0</div><div class="metric-foot"><span class="dot green"></span>Finished successfully</div></article>
+        <article class="metric"><div class="metric-label">Failed builds<i data-lucide="circle-x" class="red-text"></i></div><div id="metric-failed" class="metric-value">0</div><div id="metric-other" class="metric-foot">0 unstable · 0 aborted</div></article>
+        <article class="metric"><div class="metric-label">Pass rate<i data-lucide="activity"></i></div><div id="metric-rate" class="metric-value">--<span>%</span></div><div class="metric-foot">Excludes unknown outcomes</div></article>
+      </section>
+      <div class="analytics-grid">
+        <section class="analytics-section"><div class="section-heading"><h2>Recent build outcomes</h2><span class="small-label">LAST 30 BUILDS</span></div><div id="outcome-strip" class="outcome-strip" aria-label="Recent build outcomes"></div><div class="chart-axis"><span>Oldest</span><span>Latest</span></div><div class="chart-legend"><span><span class="dot green"></span>Passed</span><span><span class="dot red"></span>Failed</span><span><span class="dot amber"></span>Unstable / aborted</span><span><span class="dot gray"></span>Unknown</span></div><p id="outcome-caption" class="chart-caption">No builds analyzed yet.</p></section>
+        <section class="analytics-section"><div class="section-heading"><h2>Failure breakdown</h2><span class="small-label">ALL NON-PASSING</span></div><div class="breakdown"><div class="donut-wrap"><canvas id="category-chart" width="320" height="320" role="img" aria-label="No failure data"></canvas><div class="donut-label"><strong id="category-total">0</strong><span>builds</span></div></div><div id="category-legend" class="category-legend"></div></div></section>
+      </div>
+      <section id="builds" class="build-section">
+        <div class="section-heading"><h2>Build history <span id="build-count" class="count-badge">0</span></h2><span class="small-label">NEWEST FIRST</span></div>
+        <div class="filters"><label class="search-field"><i data-lucide="search"></i><input id="search" type="search" placeholder="Search builds, projects, branches..." aria-label="Search builds" maxlength="120"></label><select id="status-filter" aria-label="Filter by status"><option value="">All statuses</option><option value="passed">Passed</option><option value="failed">Failed</option><option value="unstable">Unstable</option><option value="aborted">Aborted</option><option value="unknown">Unknown</option></select><select id="category-filter" aria-label="Filter by category"><option value="">All categories</option><option value="test">Test failure</option><option value="compilation">Compilation</option><option value="timeout">Timeout</option><option value="infrastructure">Infrastructure</option><option value="build">Build failure</option><option value="unknown">Unclassified</option><option value="none">No failure</option></select><button id="clear-filters" type="button" class="icon-button" title="Clear filters" aria-label="Clear filters"><i data-lucide="filter-x"></i></button></div>
+        <div class="table-scroll"><table><thead><tr><th>Build / project</th><th>Status</th><th>Failure category</th><th>Branch</th><th>Analyzed</th><th><span class="sr-only">Details</span></th></tr></thead><tbody id="build-rows"></tbody></table></div>
+        <div id="empty-state" class="empty-state" hidden><span class="empty-icon"><i data-lucide="scan-text"></i></span><h3 id="empty-title">No builds yet</h3><p id="empty-copy">Your build history starts here.</p><button id="load-demo" type="button" class="button secondary"><i data-lucide="database"></i>Load sample builds</button></div>
+        <div class="pagination"><span id="page-label">0 builds</span><div><button id="previous" type="button" class="icon-button" aria-label="Previous page" title="Previous page" disabled><i data-lucide="chevron-left"></i></button><button id="next" type="button" class="icon-button" aria-label="Next page" title="Next page" disabled><i data-lucide="chevron-right"></i></button></div></div>
+      </section>
+      <section id="tests" class="tests-section"><div class="section-heading"><h2>Frequently failing tests</h2><span class="small-label">TOP 8 · DISTINCT BUILDS</span></div><div id="top-tests" class="top-tests"><p class="muted">No test failures recorded.</p></div></section>
+      <footer><span><i data-lucide="git-branch"></i>CI Failure Analyzer</span><span>Rule-based analysis <span class="scope-divider">/</span> v0.1.0</span></footer>
+    </main>
+  </div>
+  <dialog id="upload-dialog" aria-labelledby="upload-title">
+    <div class="dialog-heading"><div><span class="eyebrow">NEW ANALYSIS</span><h2 id="upload-title">Analyze a build</h2></div><button type="button" class="icon-button" data-close="upload-dialog" aria-label="Close upload" title="Close"><i data-lucide="x"></i></button></div>
+    <form id="upload-form">
+      <label>Build name<input name="name" placeholder="Build #142" required maxlength="120"></label>
+      <div class="form-grid"><label>Project<input name="project" value="default" required maxlength="120"></label><label>Branch<input name="branch" value="main" required maxlength="120"></label></div>
+      <div class="segmented" role="group" aria-label="Log source"><button type="button" id="file-mode" aria-pressed="true"><i data-lucide="upload"></i>Upload file</button><button type="button" id="paste-mode" aria-pressed="false"><i data-lucide="clipboard"></i>Paste log</button></div>
+      <label id="file-zone" class="file-zone"><i data-lucide="file-text"></i><span id="file-label">Choose console log</span><small>UTF-8 text · up to 2 MiB</small><input type="file" name="file" id="log-file" accept=".log,.txt,text/plain" required></label>
+      <label id="paste-zone" hidden>Console output<textarea name="log" rows="9" placeholder="[Pipeline] { (unit-tests)&#10;FAILED tests/test_boot.py::test_boot_sequence&#10;Finished: FAILURE" disabled></textarea></label>
+      <p class="privacy-note"><i data-lucide="shield-check"></i>Remove secrets before submitting. Only extracted analysis is stored.</p>
+      <p id="upload-error" class="form-error" role="alert" hidden></p>
+      <div class="dialog-actions"><button type="button" class="button secondary" data-close="upload-dialog">Cancel</button><button type="submit" id="submit-log" class="button primary"><i data-lucide="scan-line"></i>Analyze build</button></div>
+    </form>
+  </dialog>
+  <dialog id="detail-dialog" class="detail-dialog" aria-labelledby="detail-title"><div class="dialog-heading"><div><span id="detail-project" class="eyebrow"></span><h2 id="detail-title">Build details</h2></div><button type="button" class="icon-button" data-close="detail-dialog" title="Close" aria-label="Close details"><i data-lucide="x"></i></button></div><div id="detail-content"></div><div class="dialog-actions"><button id="delete-build" type="button" class="button danger"><i data-lucide="trash-2"></i>Delete</button><button id="export-build" type="button" class="button secondary"><i data-lucide="download"></i>Export JSON</button></div></dialog>
+  <dialog id="delete-dialog" class="confirm-dialog" aria-labelledby="delete-title"><h2 id="delete-title">Delete this build?</h2><p>The analysis and its failed-test records will be permanently removed.</p><div class="dialog-actions"><button type="button" class="button secondary" data-close="delete-dialog">Cancel</button><button type="button" id="confirm-delete" class="button danger">Delete build</button></div></dialog>
+  <div id="toast" class="toast" role="status" hidden></div>
+</body>
+</html>

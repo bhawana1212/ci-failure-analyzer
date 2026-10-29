@@ -1,0 +1,12 @@
+Started by user demo
+[Pipeline] Start of Pipeline
+[Pipeline] stage
+[Pipeline] { (unit-tests)
+$ pytest tests/ -q
+FAILED tests/test_boot.py::test_boot_sequence - AssertionError: expected ready, got initializing
+FAILED tests/test_driver.py::test_driver_initialization - AssertionError: driver not initialized
+2 failed, 22 passed in 3.42s
+script returned exit code 1
+[Pipeline] }
+[Pipeline] End of Pipeline
+Finished: FAILURE

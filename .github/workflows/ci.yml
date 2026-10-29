@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          python-version: ${{ matrix.python }}
+      - run: uv sync --frozen --extra dev
+      - run: uv run --frozen ruff check .
+      - run: uv run --frozen pytest -q
+
+  postgres-and-docker:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: analyzer
+          POSTGRES_PASSWORD: ci_test_only
+          POSTGRES_DB: ci_analyzer_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U analyzer -d ci_analyzer_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+      - run: uv sync --frozen --extra dev
+      - run: uv run --frozen pytest tests/test_postgres.py -q
+        env:
+          TEST_DATABASE_URL: postgresql+psycopg://analyzer:ci_test_only@localhost:5432/ci_analyzer_test
+      - run: docker build -t ci-failure-analyzer:test .
+      - run: docker run -d --name analyzer -p 127.0.0.1:8000:8000 ci-failure-analyzer:test
+      - run: curl --fail --retry 10 --retry-connrefused --retry-delay 2 http://127.0.0.1:8000/health
+      - if: always()
+        run: docker logs analyzer

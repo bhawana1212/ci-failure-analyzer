@@ -1,0 +1,14 @@
+[
+  {"name":"Build #137","project":"sample / firmware-ci","branch":"main","log":"[Pipeline] { (unit-tests)\n12 passed in 1.24s\n[Pipeline] }\nFinished: SUCCESS"},
+  {"name":"Build #138","project":"sample / firmware-ci","branch":"main","log":"[Pipeline] { (compile)\nmain.c:42: error: expected ';' before 'return'\nmake: *** [build] Error 1\n[Pipeline] }\nFinished: FAILURE"},
+  {"name":"Build #139","project":"sample / driver-tests","branch":"feature/driver-init","log":"[Pipeline] { (unit-tests)\nFAILED tests/test_driver.py::test_driver_initialization - AssertionError\n1 failed, 23 passed\n[Pipeline] }\nFinished: FAILURE"},
+  {"name":"Build #140","project":"sample / firmware-ci","branch":"main","log":"[Pipeline] { (test)\n24 passed in 2.45s\n[Pipeline] }\nFinished: SUCCESS"},
+  {"name":"Build #141","project":"sample / platform-build","branch":"main","log":"[Pipeline] { (dependencies)\ncurl: (6) Could not resolve host: packages.example.invalid\nscript returned exit code 6\n[Pipeline] }\nFinished: FAILURE"},
+  {"name":"Build #142","project":"sample / firmware-ci","branch":"feature/boot-sequence","log":"[Pipeline] { (unit-tests)\nFAILED tests/test_boot.py::test_boot_sequence - AssertionError: expected ready\nFAILED tests/test_driver.py::test_driver_initialization - AssertionError\n2 failed, 22 passed\n[Pipeline] }\nFinished: FAILURE"},
+  {"name":"Build #143","project":"sample / platform-build","branch":"release/1.2","log":"[Pipeline] { (integration-tests)\nCancelling nested steps due to timeout\n[Pipeline] }\nFinished: ABORTED"},
+  {"name":"Build #144","project":"sample / driver-tests","branch":"main","log":"[Pipeline] { (unit-tests)\n24 passed in 1.87s\n[Pipeline] }\nFinished: SUCCESS"},
+  {"name":"Build #145","project":"sample / firmware-ci","branch":"main","log":"[Pipeline] { (package)\nBUILD SUCCESS\n[Pipeline] }\nFinished: SUCCESS"},
+  {"name":"Build #146","project":"sample / driver-tests","branch":"feature/driver-init","log":"[Pipeline] { (unit-tests)\nFAILED tests/test_driver.py::test_driver_initialization - AssertionError\n1 failed, 23 passed\n[Pipeline] }\nFinished: UNSTABLE"},
+  {"name":"Build #147","project":"sample / platform-build","branch":"main","log":"[Pipeline] { (package)\nBUILD FAILED\nscript returned exit code 1\n[Pipeline] }\nFinished: FAILURE"},
+  {"name":"Build #148","project":"sample / firmware-ci","branch":"main","log":"[Pipeline] { (unit-tests)\n24 passed in 2.01s\n[Pipeline] }\nFinished: SUCCESS"}
+]
